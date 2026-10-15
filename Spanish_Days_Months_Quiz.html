@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>Spanish Days & Months Quiz</title>
+  <style>
+    :root {
+      --navy: #1a365d;
+      --blue: #2b6cb0;
+      --light-blue: #ebf8ff;
+      --correct: #38a169;
+      --wrong: #e53e3e;
+      --gray: #4a5568;
+      --bg: #f7fafc;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: linear-gradient(160deg, #ebf8ff 0%, #f7fafc 50%, #edf2f7 100%);
+      min-height: 100vh;
+      color: #1a202c;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px;
+      padding-bottom: 40px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 480px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      font-size: 1.6rem;
+      color: var(--navy);
+      margin-bottom: 4px;
+    }
+
+    .subtitle {
+      font-size: 0.95rem;
+      color: var(--gray);
+    }
+
+    /* Progress bar */
+    .progress-wrap {
+      background: #e2e8f0;
+      border-radius: 999px;
+      height: 10px;
+      margin-bottom: 8px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--blue), #4299e1);
+      border-radius: 999px;
+      width: 0%;
+      transition: width 0.35s ease;
+    }
+
+    .progress-text {
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--gray);
+      margin-bottom: 18px;
+    }
+
+    /* Card */
+    .card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(26, 54, 93, 0.12);
+      padding: 24px 20px;
+      text-align: center;
+    }
+
+    .question-label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--blue);
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+
+    .spanish-word {
+      font-size: 2.4rem;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 6px;
+      line-height: 1.2;
+    }
+
+    .category-badge {
+      display: inline-block;
+      background: var(--light-blue);
+      color: var(--blue);
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 999px;
+      margin-bottom: 18px;
+    }
+
+    /* Listen button */
+    .listen-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--navy);
+      color: white;
+      border: none;
+      border-radius: 999px;
+      padding: 12px 22px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 22px;
+      transition: background 0.2s, transform 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .listen-btn:active {
+      transform: scale(0.97);
+    }
+
+    .listen-btn.speaking {
+      background: #2c5282;
+    }
+
+    .listen-btn svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+
+    /* Options */
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      background: #f7fafc;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: #2d3748;
+      cursor: pointer;
+      transition: all 0.2s;
+      -webkit-tap-highlight-color: transparent;
+      text-align: left;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      border-color: var(--blue);
+      background: var(--light-blue);
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    .option-btn.correct {
+      background: #c6f6d5;
+      border-color: var(--correct);
+      color: #22543d;
+    }
+
+    .option-btn.wrong {
+      background: #fed7d7;
+      border-color: var(--wrong);
+      color: #742a2a;
+    }
+
+    .option-btn.reveal-correct {
+      background: #c6f6d5;
+      border-color: var(--correct);
+      color: #22543d;
+    }
+
+    /* Feedback */
+    .feedback {
+      margin-top: 16px;
+      font-size: 1rem;
+      font-weight: 600;
+      min-height: 24px;
+    }
+
+    .feedback.correct { color: var(--correct); }
+    .feedback.wrong { color: var(--wrong); }
+
+    /* Next button */
+    .next-btn {
+      display: none;
+      margin-top: 18px;
+      width: 100%;
+      background: var(--blue);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .next-btn:active {
+      background: #2c5282;
+    }
+
+    /* Results screen */
+    .results {
+      display: none;
+      text-align: center;
+      padding: 30px 20px;
+    }
+
+    .results h2 {
+      font-size: 1.8rem;
+      color: var(--navy);
+      margin-bottom: 8px;
+    }
+
+    .score-circle {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: var(--light-blue);
+      border: 6px solid var(--blue);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 20px auto;
+    }
+
+    .score-number {
+      font-size: 2.4rem;
+      font-weight: 700;
+      color: var(--navy);
+      line-height: 1;
+    }
+
+    .score-label {
+      font-size: 0.85rem;
+      color: var(--gray);
+    }
+
+    .results-message {
+      font-size: 1.1rem;
+      color: var(--gray);
+      margin-bottom: 24px;
+    }
+
+    .restart-btn {
+      background: var(--navy);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 14px 28px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .restart-btn:active {
+      opacity: 0.9;
+    }
+
+    /* Start screen */
+    .start-screen {
+      text-align: center;
+      padding: 20px 10px;
+    }
+
+    .start-screen p {
+      color: var(--gray);
+      margin: 12px 0 24px;
+      line-height: 1.5;
+      font-size: 1rem;
+    }
+
+    .start-btn {
+      background: var(--navy);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 16px 36px;
+      font-size: 1.15rem;
+      font-weight: 600;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .start-btn:active {
+      opacity: 0.9;
+    }
+
+    .features {
+      text-align: left;
+      margin: 20px auto 0;
+      max-width: 320px;
+      font-size: 0.95rem;
+      color: #2d3748;
+    }
+
+    .features li {
+      margin-bottom: 8px;
+      list-style: none;
+      padding-left: 4px;
+    }
+
+    .features li::before {
+      content: "✓ ";
+      color: var(--correct);
+      font-weight: 700;
+    }
+
+    /* Speech support warning */
+    .speech-warning {
+      display: none;
+      background: #fefcbf;
+      border: 1px solid #d69e2e;
+      color: #744210;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      margin-bottom: 16px;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Spanish Days & Months</h1>
+      <p class="subtitle">Multiple-Choice Review Game</p>
+    </header>
+
+    <!-- START SCREEN -->
+    <div class="card" id="start-screen">
+      <div class="start-screen">
+        <p>Test yourself on the days of the week and months of the year!</p>
+        <ul class="features">
+          <li>Questions show the Spanish word</li>
+          <li>Tap 🔊 to hear the pronunciation</li>
+          <li>Choose the correct English meaning</li>
+          <li>19 questions total (all days + months)</li>
+        </ul>
+        <br />
+        <button class="start-btn" onclick="startQuiz()">Start Quiz</button>
+      </div>
+    </div>
+
+    <!-- QUIZ SCREEN -->
+    <div id="quiz-screen" style="display:none;">
+      <div class="progress-wrap">
+        <div class="progress-bar" id="progress-bar"></div>
+      </div>
+      <div class="progress-text" id="progress-text">Question 1 of 19</div>
+
+      <div class="speech-warning" id="speech-warning">
+        ⚠️ Speech may not be fully supported on this device. You can still play the quiz!
+      </div>
+
+      <div class="card">
+        <div class="question-label">What does this mean in English?</div>
+        <div class="spanish-word" id="spanish-word">lunes</div>
+        <div class="category-badge" id="category-badge">Day of the week</div>
+
+        <button class="listen-btn" id="listen-btn" onclick="speakWord()">
+          <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+          Listen
+        </button>
+
+        <div class="options" id="options"></div>
+        <div class="feedback" id="feedback"></div>
+        <button class="next-btn" id="next-btn" onclick="nextQuestion()">Next →</button>
+      </div>
+    </div>
+
+    <!-- RESULTS SCREEN -->
+    <div class="card results" id="results-screen">
+      <h2>Quiz Complete!</h2>
+      <div class="score-circle">
+        <div class="score-number" id="score-number">0</div>
+        <div class="score-label">correct</div>
+      </div>
+      <p class="results-message" id="results-message"></p>
+      <button class="restart-btn" onclick="restartQuiz()">Play Again</button>
+    </div>
+  </div>
+
+  <script>
+    // All vocabulary
+    const vocabulary = [
+      // Days
+      { spanish: "lunes", english: "Monday", category: "Day of the week" },
+      { spanish: "martes", english: "Tuesday", category: "Day of the week" },
+      { spanish: "miércoles", english: "Wednesday", category: "Day of the week" },
+      { spanish: "jueves", english: "Thursday", category: "Day of the week" },
+      { spanish: "viernes", english: "Friday", category: "Day of the week" },
+      { spanish: "sábado", english: "Saturday", category: "Day of the week" },
+      { spanish: "domingo", english: "Sunday", category: "Day of the week" },
+      // Months
+      { spanish: "enero", english: "January", category: "Month" },
+      { spanish: "febrero", english: "February", category: "Month" },
+      { spanish: "marzo", english: "March", category: "Month" },
+      { spanish: "abril", english: "April", category: "Month" },
+      { spanish: "mayo", english: "May", category: "Month" },
+      { spanish: "junio", english: "June", category: "Month" },
+      { spanish: "julio", english: "July", category: "Month" },
+      { spanish: "agosto", english: "August", category: "Month" },
+      { spanish: "septiembre", english: "September", category: "Month" },
+      { spanish: "octubre", english: "October", category: "Month" },
+      { spanish: "noviembre", english: "November", category: "Month" },
+      { spanish: "diciembre", english: "December", category: "Month" },
+    ];
+
+    // All possible English answers (for distractors)
+    const allEnglish = vocabulary.map(v => v.english);
+
+    let questions = [];
+    let currentIndex = 0;
+    let score = 0;
+    let answered = false;
+
+    // Fisher-Yates shuffle
+    function shuffle(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function getDistractors(correct, count = 3) {
+      const others = allEnglish.filter(e => e !== correct);
+      return shuffle(others).slice(0, count);
+    }
+
+    function buildQuestions() {
+      questions = shuffle(vocabulary).map(item => {
+        const distractors = getDistractors(item.english);
+        const options = shuffle([item.english, ...distractors]);
+        return {
+          ...item,
+          options
+        };
+      });
+    }
+
+    // Speech synthesis
+    let spanishVoice = null;
+
+    function loadVoices() {
+      const voices = speechSynthesis.getVoices();
+      // Prefer a Spanish voice
+      spanishVoice = voices.find(v => v.lang.startsWith("es")) ||
+                    voices.find(v => v.lang.includes("ES")) ||
+                    voices.find(v => v.name.toLowerCase().includes("spanish")) ||
+                    null;
+    }
+
+    if (typeof speechSynthesis !== "undefined") {
+      loadVoices();
+      if (speechSynthesis.onvoiceschanged !== undefined) {
+        speechSynthesis.onvoiceschanged = loadVoices;
+      }
+    }
+
+    function speakWord() {
+      if (typeof speechSynthesis === "undefined") {
+        document.getElementById("speech-warning").style.display = "block";
+        return;
+      }
+
+      const word = questions[currentIndex].spanish;
+      speechSynthesis.cancel(); // stop any previous speech
+
+      const utterance = new SpeechSynthesisUtterance(word);
+      utterance.lang = "es-ES";
+      utterance.rate = 0.85;   // slightly slower for learning
+      utterance.pitch = 1;
+
+      if (spanishVoice) {
+        utterance.voice = spanishVoice;
+      }
+
+      const btn = document.getElementById("listen-btn");
+      btn.classList.add("speaking");
+      btn.innerHTML = `
+        <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+        Speaking…
+      `;
+
+      utterance.onend = () => {
+        btn.classList.remove("speaking");
+        btn.innerHTML = `
+          <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+          Listen
+        `;
+      };
+
+      speechSynthesis.speak(utterance);
+    }
+
+    function startQuiz() {
+      buildQuestions();
+      currentIndex = 0;
+      score = 0;
+      answered = false;
+
+      document.getElementById("start-screen").style.display = "none";
+      document.getElementById("results-screen").style.display = "none";
+      document.getElementById("quiz-screen").style.display = "block";
+
+      // Check speech support
+      if (typeof speechSynthesis === "undefined") {
+        document.getElementById("speech-warning").style.display = "block";
+      }
+
+      showQuestion();
+    }
+
+    function showQuestion() {
+      answered = false;
+      const q = questions[currentIndex];
+
+      document.getElementById("spanish-word").textContent = q.spanish;
+      document.getElementById("category-badge").textContent = q.category;
+      document.getElementById("feedback").textContent = "";
+      document.getElementById("feedback").className = "feedback";
+      document.getElementById("next-btn").style.display = "none";
+
+      // Progress
+      const pct = (currentIndex / questions.length) * 100;
+      document.getElementById("progress-bar").style.width = pct + "%";
+      document.getElementById("progress-text").textContent =
+        `Question ${currentIndex + 1} of ${questions.length}`;
+
+      // Options
+      const optionsDiv = document.getElementById("options");
+      optionsDiv.innerHTML = "";
+      q.options.forEach((opt, i) => {
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.textContent = opt;
+        btn.onclick = () => selectAnswer(opt, btn);
+        optionsDiv.appendChild(btn);
+      });
+
+      // Auto-speak after a short delay (optional – user can also tap)
+      // We leave it manual so the user controls when they hear it.
+    }
+
+    function selectAnswer(selected, btnElement) {
+      if (answered) return;
+      answered = true;
+
+      const q = questions[currentIndex];
+      const isCorrect = selected === q.english;
+
+      // Disable all buttons
+      const allBtns = document.querySelectorAll(".option-btn");
+      allBtns.forEach(b => {
+        b.disabled = true;
+        if (b.textContent === q.english) {
+          b.classList.add("reveal-correct");
+        }
+      });
+
+      if (isCorrect) {
+        score++;
+        btnElement.classList.add("correct");
+        document.getElementById("feedback").textContent = "✓ Correct!";
+        document.getElementById("feedback").className = "feedback correct";
+      } else {
+        btnElement.classList.add("wrong");
+        document.getElementById("feedback").textContent = `✗ The answer is ${q.english}`;
+        document.getElementById("feedback").className = "feedback wrong";
+      }
+
+      // Show next button
+      const nextBtn = document.getElementById("next-btn");
+      if (currentIndex < questions.length - 1) {
+        nextBtn.textContent = "Next →";
+      } else {
+        nextBtn.textContent = "See Results →";
+      }
+      nextBtn.style.display = "block";
+    }
+
+    function nextQuestion() {
+      currentIndex++;
+      if (currentIndex >= questions.length) {
+        showResults();
+      } else {
+        showQuestion();
+      }
+    }
+
+    function showResults() {
+      document.getElementById("quiz-screen").style.display = "none";
+      document.getElementById("results-screen").style.display = "block";
+
+      document.getElementById("score-number").textContent = score;
+
+      const total = questions.length;
+      const pct = Math.round((score / total) * 100);
+      let msg = "";
+      if (pct === 100) msg = "¡Perfecto! You know them all! 🎉";
+      else if (pct >= 80) msg = "¡Excelente! Great job!";
+      else if (pct >= 60) msg = "¡Bien! Keep practicing!";
+      else msg = "Keep reviewing — you’ll get them next time!";
+
+      document.getElementById("results-message").textContent =
+        `You got ${score} out of ${total} correct (${pct}%). ${msg}`;
+    }
+
+    function restartQuiz() {
+      document.getElementById("results-screen").style.display = "none";
+      startQuiz();
+    }
+
+    // Preload voices on iOS
+    document.addEventListener("click", function initSpeech() {
+      if (typeof speechSynthesis !== "undefined") {
+        speechSynthesis.getVoices();
+      }
+      document.removeEventListener("click", initSpeech);
+    }, { once: true });
+  </script>
+</body>
+</html>
